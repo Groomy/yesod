@@ -769,6 +769,19 @@ fileField = Field
         |]
     , fieldEnctype = Multipart
     }
+    
+multiFileField :: Monad m
+          => Field m [FileInfo]
+multiFileField = Field
+    { fieldParse = \_ files -> return $
+        case files of
+            [] -> Right Nothing
+            xs -> Right $ Just xs
+    , fieldView = \id' name attrs _ isReq -> toWidget [hamlet|
+            <input id=#{id'} name=#{name} *{attrs} type=file :isReq:required multiple>
+        |]
+    , fieldEnctype = Multipart
+    }
 
 fileAFormReq :: (MonadHandler m, RenderMessage (HandlerSite m) FormMessage)
              => FieldSettings (HandlerSite m) -> AForm m FileInfo
